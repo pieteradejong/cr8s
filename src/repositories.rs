@@ -15,13 +15,13 @@ impl RustaceanRepository {
     }
 
     pub fn create(c: &mut PgConnection, new_rustacean: NewRustacean) -> QueryResult<Rustacean> {
-        diesel::insert_into(rustacean::table)
+        diesel::insert_into(rustaceans::table)
             .values(new_rustacean)
             .get_result(c)
     }
 
     pub fn update(c: &mut PgConnection, id: i32, rustacean: Rustacean) -> QueryResult<Rustacean> {
-        diesel::update(rustacean.find(id))
+        diesel::update(rustaceans::table.find(id))
             .set((
                 rustaceans::name.eq(rustacean.name),
                 rustaceans::email.eq(rustacean.email),
@@ -30,7 +30,7 @@ impl RustaceanRepository {
     }
 
     pub fn delete(c: &mut PgConnection, id: i32) -> QueryResult<usize> {
-        diesel::delete(rustaceans::table.find(id)).execute(id)
+        diesel::delete(rustaceans::table.find(id)).execute(c)
     }
 }
 
@@ -52,7 +52,7 @@ impl CrateRepository {
     }
 
     pub fn update(c: &mut PgConnection, id: i32, crate_: Crate) -> QueryResult<Crate> {
-        diesel::update(rustacean.find(id))
+        diesel::update(crates::table.find(id))
             .set((
                 crates::rustacean_id.eq(crate_.rustacean_id),
                 crates::code.eq(crate_.code),
@@ -64,6 +64,6 @@ impl CrateRepository {
     }
 
     pub fn delete(c: &mut PgConnection, id: i32) -> QueryResult<usize> {
-        diesel::delete(crates::table.find(id)).execute(id)
+        diesel::delete(crates::table.find(id)).execute(c)
     }
 }
