@@ -1,4 +1,4 @@
-use reqwest::{blocking::Client, StatusCode};
+use reqwest::{blocking::Client, StatusCode, header::ACCEPT_CHARSET};
 use serde_json::{json, Value};
 
 pub mod common;
@@ -93,6 +93,31 @@ fn test_update_crate() {
         "version": "0.3",
         "description": "The Crate Organization",
         "rustacean_id": rustacean["id"],
+        "created_at": a_crate["created_at"]
+    }));
+
+    // Test changing crate author
+    let rustacean2 = common::create_test_rustacean(&client);
+    let response = client.put(format!("{}/crates/{}", common::APP_HOST, a_crate["id"]))
+        .json(&json!({
+            "code": "bla",
+            "name": "Something else",
+            "version": "0.3",
+            "description": "The Crate Organization",
+            "rustacean_id": rustacean2["id"]
+        }))
+        .send()
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    
+    let a_crate: Value = response.json().unwrap();
+    assert_eq!(a_crate, json!({
+        "id": a_crate["id"],
+        "code": "bla",
+        "name": "Something else",
+        "version": "0.3",
+        "description": "The Crate Organization",
+        "rustacean_id": rustacean2["id"],
         "created_at": a_crate["created_at"]
     }));
 
